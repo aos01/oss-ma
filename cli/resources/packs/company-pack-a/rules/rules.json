@@ -1,0 +1,12 @@
+{
+  "requiredFiles": [
+    "SECURITY.md"
+  ],
+  "requiredScripts": [
+    "audit",
+    "typecheck"
+  ],
+  "forbiddenPatterns": [
+    "alert("
+  ]
+}

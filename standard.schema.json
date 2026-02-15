@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "requiredFiles": [
+    "README.md",
+    ".editorconfig",
+    ".gitignore",
+    "template.lock",
+    ".github/workflows/ci.yml"
+  ],
+  "requiredDirs": [
+    "docs/adr"
+  ],
+  "readmeRequiredHeadings": [
+    "Overview",
+    "Quickstart",
+    "Scripts",
+    "Architecture",
+    "Contributing"
+  ],
+  "requiredAdrFiles": [
+    "docs/adr/0001-context.md"
+  ],
+  "requiredActions": [
+    "lint",
+    "format",
+    "test",
+    "build"
+  ]
+}

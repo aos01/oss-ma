@@ -1,0 +1,219 @@
+# .github/workflows/release.yml
+# npm publish via OIDC Trusted Publishing (no tokens, no OTP, SLSA L3)
+# Triggered ONLY on version tags vX.Y.Z
+
+name: release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions: {}
+
+jobs:
+  # ── 1. Build & Test ─────────────────────────────────────────────────────────
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: cli/package-lock.json
+
+      - name: Install dependencies
+        working-directory: cli
+        run: npm ci --ignore-scripts
+
+      - name: Build
+        working-directory: cli
+        run: npm run build
+
+      - name: Audit dependencies
+        working-directory: cli
+        run: npm audit --audit-level=high
+
+      - name: Run tests
+        working-directory: cli
+        run: npm run test:smoke
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: cli/dist/
+          retention-days: 1
+
+  # ── 2. Publish (OIDC Trusted Publishing) ────────────────────────────────────
+  publish:
+    name: Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: cli/package-lock.json
+
+      - name: Upgrade npm (OIDC requires npm >=11.5.1)
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        working-directory: cli
+        run: npm ci --ignore-scripts
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: cli/dist/
+
+      - name: Verify tag matches package.json version
+        working-directory: cli
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "❌ Tag $TAG_VERSION does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+          echo "✅ Version match: $PKG_VERSION"
+
+      - name: Publish (OIDC Trusted Publishing)
+        working-directory: cli
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ""
+
+
+
+# # .github/workflows/release.yml
+# # Publishes @oss-ma/tpl to npm with SLSA Level 3 provenance via Sigstore.
+# # Triggered exclusively on version tags (v*). Never publish manually from local.
+
+# name: release
+
+# on:
+#   push:
+#     tags:
+#       - 'v[0-9]+.[0-9]+.[0-9]+'
+
+# # Global: deny everything, grant per-job only
+# permissions: {}
+
+# jobs:
+#   # ── 1. Build & Test ──────────────────────────────────────────────────────────
+#   build:
+#     name: Build & Test
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+#         with:
+#           persist-credentials: false
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.1.0
+#         with:
+#           node-version: 20
+#           cache: npm
+#           cache-dependency-path: cli/package-lock.json
+
+#       - name: Install dependencies
+#         working-directory: cli
+#         run: npm ci --ignore-scripts
+
+#       - name: Build
+#         working-directory: cli
+#         run: npm run build
+
+#       - name: Audit dependencies (high+)
+#         working-directory: cli
+#         run: npm audit --audit-level=high
+
+#       - name: Run tests
+#         working-directory: cli
+#         run: npm test --if-present
+
+#       - name: Upload dist artifact
+#         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+#         with:
+#           name: dist
+#           path: cli/dist/
+#           retention-days: 1
+
+#   # ── 2. Publish to npm with provenance ────────────────────────────────────────
+#   publish:
+#     name: Publish to npm
+#     needs: build
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       id-token: write   # Required for OIDC → Sigstore provenance (SLSA L3)
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+#         with:
+#           persist-credentials: false
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.1.0
+#         with:
+#           node-version: 20
+#           registry-url: 'https://registry.npmjs.org'
+#           cache: npm
+#           cache-dependency-path: cli/package-lock.json
+
+#       - name: Install dependencies
+#         working-directory: cli
+#         run: npm ci --ignore-scripts
+
+#       - name: Download dist artifact
+#         uses: actions/download-artifact@fa0a91b85d4f404e444306234d20f47dcb7ec6b9 # v4.1.8
+#         with:
+#           name: dist
+#           path: cli/dist/
+
+#       - name: Verify tag matches package.json version
+#         working-directory: cli
+#         run: |
+#           PKG_VERSION=$(node -p "require('./package.json').version")
+#           TAG_VERSION="${GITHUB_REF_NAME#v}"
+#           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+#             echo "❌ Tag $TAG_VERSION does not match package.json version $PKG_VERSION"
+#             exit 1
+#           fi
+#           echo "✅ Version match: $PKG_VERSION"
+
+#       - name: Publish with provenance (SLSA Level 3)
+#         working-directory: cli
+#         run: npm publish --access public --provenance
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

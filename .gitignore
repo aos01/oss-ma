@@ -1,0 +1,27 @@
+# Node
+node_modules/
+dist/
+*.tgz
+
+# CLI temp
+cli/.tmp-tests/
+cli/my-app/
+cli/demo-app/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local dev artifacts
+MonREADME.md
+s.md
+package/
+mon-app/
+mon-app2/
+mon-app3/
+mon-app4/
+test-check/
+hello-world/

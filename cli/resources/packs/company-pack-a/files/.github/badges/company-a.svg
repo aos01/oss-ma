@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="20">
+  <rect width="120" height="20" fill="#0052cc"/>
+  <text x="60" y="14" fill="#fff" text-anchor="middle" font-size="12">
+    Company A
+  </text>
+</svg>

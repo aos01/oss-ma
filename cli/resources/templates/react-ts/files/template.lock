@@ -1,0 +1,9 @@
+{
+  "template": "react-ts",
+  "version": "1.0.0",
+  "options": {
+    "appName": "{{appName}}",
+    "packageManager": "{{packageManager}}"
+  },
+  "generatedAt": "{{isoDate}}"
+}

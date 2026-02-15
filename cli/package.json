@@ -1,0 +1,36 @@
+{
+  "name": "@oss-ma/tpl",
+  "version": "1.0.27",
+  "description": "Generate, enforce and maintain clean project architectures",
+  "type": "module",
+  "bin": {
+    "tpl": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "resources"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test:smoke": "node --test dist/tests/smoke.test.js"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "execa": "^9.3.0",
+    "fs-extra": "^11.2.0",
+    "picocolors": "^1.0.0",
+    "prompts": "^2.4.2",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.7.0",
+    "@types/prompts": "^2.4.9",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4"
+  }
+}

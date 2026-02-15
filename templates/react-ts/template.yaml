@@ -1,0 +1,20 @@
+name: react-ts
+version: 1.0.0
+description: "Template React + TypeScript (Vite) with lint/format/test/build + CI + ADR"
+engine: "v1"
+
+questions:
+  - name: appName
+    message: "Nom du projet ?"
+    default: "my-react-app"
+
+  - name: packageManager
+    message: "Package manager ?"
+    choices: ["npm", "pnpm", "yarn"]
+    default: "npm"
+
+hooks:
+  postGenerate:
+    - run: "git init"
+    - run: "{{packageManager}} install"
+    - run: "{{packageManager}} run test"

@@ -1,0 +1,29 @@
+name: company-pack-a
+version: 1.0.0
+description: "Company A mandatory engineering standards"
+
+appliesTo:
+  templates:
+    - react-ts
+
+enforcement:
+  level: strict
+
+adds:
+  files: true
+  rules: true
+
+# name: company-pack-a
+# version: 1.0.0
+# description: "Company A engineering standards"
+
+# appliesTo:
+#   templates:
+#     - react-ts
+
+# enforces:
+#   level: strict   # strict | advisory
+
+# adds:
+#   files: true
+#   rules: true

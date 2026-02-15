@@ -1,0 +1,71 @@
+# .github/workflows/codeql.yml
+# Static analysis (SAST) on the CLI source code
+# Runs on every push to main, every PR, and weekly schedule
+
+name: codeql
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "cli/src/**"
+      - "cli/package.json"
+      - "cli/tsconfig.json"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "cli/src/**"
+      - "cli/package.json"
+      - "cli/tsconfig.json"
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+
+permissions: {}
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: cli/package-lock.json
+
+      - name: Install dependencies
+        working-directory: cli
+        run: npm ci --ignore-scripts
+
+      - name: Build (required for compiled JS analysis)
+        working-directory: cli
+        run: npm run build
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+          config: |
+            paths:
+              - cli/src
+            paths-ignore:
+              - cli/node_modules
+              - cli/dist
+              - cli/resources
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

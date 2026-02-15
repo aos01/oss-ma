@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!--
+      Content Security Policy — defence-in-depth against XSS.
+      Adjust 'connect-src' if you add external APIs.
+      Remove 'unsafe-eval' once all dependencies support it.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src  'self' 'unsafe-inline';
+        style-src   'self' 'unsafe-inline';
+        img-src     'self' data: blob:;
+        font-src    'self';
+        connect-src 'self';
+        object-src  'none';
+        base-uri    'self';
+        form-action 'self';
+        frame-ancestors 'none';
+      "
+    />
+
+    <!-- Prevent MIME-type sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <!-- Block referrer leakage -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{appName}}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/main.tsx"></script>
+  </body>
+</html>
