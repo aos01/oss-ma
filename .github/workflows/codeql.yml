@@ -1,6 +1,5 @@
 # .github/workflows/codeql.yml
 # Static analysis (SAST) on the CLI source code
-# Runs on every push to main, every PR, and weekly schedule
 
 name: codeql
 
@@ -18,7 +17,6 @@ on:
       - "cli/package.json"
       - "cli/tsconfig.json"
   schedule:
-    # Every Monday at 08:00 UTC
     - cron: "0 8 * * 1"
 
 permissions: {}
@@ -29,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       security-events: write
 
     steps:
@@ -48,7 +47,7 @@ jobs:
         working-directory: cli
         run: npm ci --ignore-scripts
 
-      - name: Build (required for compiled JS analysis)
+      - name: Build
         working-directory: cli
         run: npm run build
 
