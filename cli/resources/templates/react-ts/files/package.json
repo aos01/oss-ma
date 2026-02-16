@@ -18,17 +18,17 @@
     "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.56.0",
     "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "react-router-dom": "^6.26.0",
-    "zustand": "^4.5.0"
+    "react-dom": "^18.3.0"{{#if routing}},
+    "react-router-dom": "^6.26.0"{{/if}}{{#if state}},
+    "zustand": "^4.5.0"{{/if}}{{#if fetching}},
+    "@tanstack/react-query": "^5.56.0"{{/if}}
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.0",
-    "@eslint/js": "^9.0.0",
-    "@tanstack/react-query-devtools": "^5.56.0",
+    "@eslint/js": "^9.0.0",{{#if fetching}}
+    "@tanstack/react-query-devtools": "^5.56.0",{{/if}}
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.0",

@@ -1,6 +1,11 @@
+{{#if fetching}}
 import { useQuery } from "@tanstack/react-query";
+{{/if}}
+{{#if state}}
 import { useCounterStore } from "./store";
+{{/if}}
 import { Button } from "@/shared/ui/Button";
+{{#if fetching}}
 
 interface Post {
   id: number;
@@ -12,18 +17,23 @@ async function fetchPosts(): Promise<Post[]> {
   if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();
 }
+{{/if}}
 
 export function ExampleFeature() {
+  {{#if state}}
   const { count, increment, decrement, reset } = useCounterStore();
+  {{/if}}
+  {{#if fetching}}
 
   const { data: posts, isLoading, isError } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
   });
+  {{/if}}
 
   return (
     <section style={{ marginTop: "2rem" }}>
-      {/* Zustand counter */}
+      {{#if state}}
       <div style={{ marginBottom: "2rem" }}>
         <h2>Counter (Zustand)</h2>
         <p style={{ fontSize: "2rem", margin: "0.5rem 0" }}>{count}</p>
@@ -33,8 +43,8 @@ export function ExampleFeature() {
           <Button onClick={reset} variant="secondary">Reset</Button>
         </div>
       </div>
-
-      {/* React Query fetch */}
+      {{/if}}
+      {{#if fetching}}
       <div>
         <h2>Posts (TanStack Query)</h2>
         {isLoading && <p>Loading...</p>}
@@ -49,6 +59,12 @@ export function ExampleFeature() {
           </ul>
         )}
       </div>
+      {{/if}}
+      {{#unless state}}
+      {{#unless fetching}}
+      <p>Feature module — add your components here.</p>
+      {{/unless}}
+      {{/unless}}
     </section>
   );
 }

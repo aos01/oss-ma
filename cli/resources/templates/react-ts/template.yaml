@@ -1,6 +1,6 @@
 name: react-ts
-version: 1.0.0
-description: "Template React + TypeScript (Vite) with lint/format/test/build + CI + ADR"
+version: 2.0.0
+description: "Template React + TypeScript (Vite) with optional routing, state and fetching"
 engine: "v1"
 
 questions:
@@ -12,6 +12,21 @@ questions:
     message: "Package manager ?"
     choices: ["npm", "pnpm", "yarn"]
     default: "npm"
+
+  - name: routing
+    message: "Routing ?"
+    choices: ["react-router", "none"]
+    default: "react-router"
+
+  - name: state
+    message: "State management ?"
+    choices: ["zustand", "none"]
+    default: "zustand"
+
+  - name: fetching
+    message: "Data fetching ?"
+    choices: ["tanstack-query", "none"]
+    default: "tanstack-query"
 
 hooks:
   postGenerate:
