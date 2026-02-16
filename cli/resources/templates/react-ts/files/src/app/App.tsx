@@ -1,10 +1,12 @@
-import { Example } from "../features/example/Example.js";
+import { Routes, Route } from "react-router-dom";
+import { HomePage } from "@/pages/HomePage";
+import { NotFoundPage } from "@/pages/NotFoundPage";
 
 export function App() {
   return (
-    <main style={{ padding: 16 }}>
-      <h1>{{appName}}</h1>
-      <Example />
-    </main>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }
