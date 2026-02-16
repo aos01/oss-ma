@@ -3,6 +3,14 @@
   "version": "1.0.28",
   "description": "Generate, enforce and maintain clean project architectures",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aos01/oss-ma"
+  },
+  "homepage": "https://github.com/aos01/oss-ma#readme",
+  "bugs": {
+    "url": "https://github.com/aos01/oss-ma/issues"
+  },
   "bin": {
     "tpl": "dist/index.js"
   },
