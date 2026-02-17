@@ -20,14 +20,33 @@ async function hashFile(filePath: string): Promise<string> {
   return crypto.createHash("sha256").update(content).digest("hex");
 }
 
-async function collectFiles(dir: string): Promise<string[]> {
+const EXCLUDED_DIRS = new Set([
+  "node_modules",
+  ".git",
+  ".next",
+  "dist",
+  "build",
+  "coverage",
+  ".turbo",
+  ".cache",
+]);
+
+async function collectFiles(dir: string, root?: string): Promise<string[]> {
+  const baseDir = root ?? dir;
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const results: string[] = [];
+
   for (const entry of entries) {
+    if (EXCLUDED_DIRS.has(entry.name)) continue;
+
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...(await collectFiles(full)));
-    else if (entry.isFile()) results.push(full);
+    if (entry.isDirectory()) {
+      results.push(...(await collectFiles(full, baseDir)));
+    } else if (entry.isFile()) {
+      results.push(full);
+    }
   }
+
   return results.sort();
 }
 
