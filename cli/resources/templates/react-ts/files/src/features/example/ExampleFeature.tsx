@@ -24,7 +24,6 @@ export function ExampleFeature() {
   const { count, increment, decrement, reset } = useCounterStore();
   {{/if}}
   {{#if fetching}}
-
   const { data: posts, isLoading, isError } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
@@ -60,11 +59,6 @@ export function ExampleFeature() {
         )}
       </div>
       {{/if}}
-      {{#unless state}}
-      {{#unless fetching}}
-      <p>Feature module — add your components here.</p>
-      {{/unless}}
-      {{/unless}}
     </section>
   );
 }
