@@ -1,6 +1,6 @@
 {
   "name": "@oss-ma/tpl",
-  "version": "1.0.31",
+  "version": "1.0.32",
   "description": "Generate, enforce and maintain clean project architectures",
   "type": "module",
   "repository": {
