@@ -8,11 +8,12 @@ import pc from "picocolors";
 import { loadStandardSchema, checkAgainstStandard } from "../engine/validators/standard.js";
 import { readTemplateLock } from "../engine/readLock.js";
 import { validateReactTs } from "../engine/validators/reactTs.js";
+import { validateReactNext } from "../engine/validators/reactNext.js";
 import { loadPack } from "../engine/packs/loadPack.js";
-import { validatePackRules } from "../engine/packs/validatePackRules.js";;
+import { validatePackRules } from "../engine/packs/validatePackRules.js";
 import type { CheckIssue } from "../engine/validators/standard.js";
 
-// ── Integrity helpers 
+// ── Integrity helpers ────────────────────────────────────────────────────────
 
 async function hashFile(filePath: string): Promise<string> {
   const content = await fs.readFile(filePath);
@@ -82,20 +83,29 @@ async function verifyIntegrity(
 
 // ── Output ───────────────────────────────────────────────────────────────────
 
-function printHuman(result: Awaited<ReturnType<typeof checkAgainstStandard>> & { schemaVersion: string }) {
+function printHuman(
+  result: Awaited<ReturnType<typeof checkAgainstStandard>> & {
+    schemaVersion: string;
+    template?: string;
+  }
+) {
+  const templateLabel = result.template ? pc.gray(` [${result.template}]`) : "";
+
   if (result.ok) {
-    console.log(pc.green(`✅ OK — Standard v${result.schemaVersion}`));
+    console.log(pc.green(`✅ OK — Standard v${result.schemaVersion}${templateLabel}`));
     console.log(`Project: ${result.projectPath}`);
     return;
   }
 
-  console.log(pc.red(`❌ FAILED — Standard v${result.schemaVersion}`));
+  console.log(pc.red(`❌ FAILED — Standard v${result.schemaVersion}${templateLabel}`));
   console.log(`Project: ${result.projectPath}`);
   console.log("");
 
   for (const issue of result.issues) {
-    console.log(`${pc.red("•")} ${issue.message}${issue.path ? pc.gray(` (${issue.path})`) : ""}`);
-    if ((issue as any).hint) console.log(`  ${pc.gray("hint:")} ${(issue as any).hint}`);
+    console.log(
+      `${pc.red("•")} ${issue.message}${issue.path ? pc.gray(` (${issue.path})`) : ""}`
+    );
+    if (issue.hint) console.log(`  ${pc.gray("hint:")} ${issue.hint}`);
   }
 
   console.log("");
@@ -124,10 +134,12 @@ export const checkCommand = new Command("check")
         integrityIssues = await verifyIntegrity(standardResult.projectPath, lock.filesIntegrity);
       }
 
-      // 4) Template-specific
+      // 4) Template-specific validation
       let templateIssues: CheckIssue[] = [];
       if (lock?.template === "react-ts") {
         templateIssues = await validateReactTs(standardResult.projectPath);
+      } else if (lock?.template === "react-next") {
+        templateIssues = await validateReactNext(standardResult.projectPath);
       }
 
       // 5) Packs
@@ -136,8 +148,8 @@ export const checkCommand = new Command("check")
         for (const packName of lock.packs) {
           const pack = await loadPack(packName);
           const issues = await validatePackRules(pack, standardResult.projectPath);
-
           const level = pack.spec.enforcement?.level ?? "strict";
+
           if (level === "advisory") {
             packIssues.push(
               ...issues.map((i: CheckIssue) => ({
@@ -153,9 +165,15 @@ export const checkCommand = new Command("check")
       }
 
       // 6) Combine
-      const blockingIntegrityIssues = integrityIssues.filter((i) => i.code !== "INTEGRITY_ADDED_FILE");
-      const advisoryIntegrityIssues = integrityIssues.filter((i) => i.code === "INTEGRITY_ADDED_FILE");
-      const blockingPackIssues = packIssues.filter((i) => !String(i.code).startsWith("PACK_WARNING:"));
+      const blockingIntegrityIssues = integrityIssues.filter(
+        (i) => i.code !== "INTEGRITY_ADDED_FILE"
+      );
+      const advisoryIntegrityIssues = integrityIssues.filter(
+        (i) => i.code === "INTEGRITY_ADDED_FILE"
+      );
+      const blockingPackIssues = packIssues.filter(
+        (i) => !String(i.code).startsWith("PACK_WARNING:")
+      );
 
       const issues = [
         ...standardResult.issues,
@@ -167,11 +185,12 @@ export const checkCommand = new Command("check")
 
       const ok =
         standardResult.issues.length +
-        blockingIntegrityIssues.length +
-        templateIssues.length +
-        blockingPackIssues.length === 0;
+          blockingIntegrityIssues.length +
+          templateIssues.length +
+          blockingPackIssues.length ===
+        0;
 
-      const result = { ...standardResult, issues, ok };
+      const result = { ...standardResult, issues, ok, template: lock?.template };
 
       if (opts.json) console.log(JSON.stringify(result, null, 2));
       else printHuman(result);
