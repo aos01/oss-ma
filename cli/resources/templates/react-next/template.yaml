@@ -1,0 +1,37 @@
+name: react-next
+version: 1.0.0
+description: "Next.js 14 App Router + TypeScript with optional state and fetching"
+engine: "v1"
+
+questions:
+  - name: appName
+    message: "Nom du projet ?"
+    default: "my-next-app"
+
+  - name: packageManager
+    message: "Package manager ?"
+    choices: ["npm", "pnpm", "yarn"]
+    default: "npm"
+
+  - name: state
+    message: "State management ?"
+    choices: ["zustand", "none"]
+    default: "zustand"
+
+  - name: fetching
+    message: "Data fetching ?"
+    choices: ["tanstack-query", "none"]
+    default: "tanstack-query"
+
+hooks:
+  postGenerate:
+    - run: "git init"
+
+    - run: "npm install --ignore-scripts"
+      when: "{{packageManager}} == npm"
+
+    - run: "pnpm install --ignore-scripts"
+      when: "{{packageManager}} == pnpm"
+
+    - run: "yarn install --ignore-scripts"
+      when: "{{packageManager}} == yarn"

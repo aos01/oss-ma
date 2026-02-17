@@ -2,17 +2,13 @@
 import { ExampleFeature } from "@/features/example/ExampleFeature";
 {{/if}}
 {{#unless state}}
-{{#unless fetching}}
 import { Button } from "@/shared/ui/Button";
 import { useState } from "react";
-{{/unless}}
 {{/unless}}
 
 export function HomePage() {
   {{#unless state}}
-  {{#unless fetching}}
   const [msg, setMsg] = useState<string | null>(null);
-  {{/unless}}
   {{/unless}}
 
   return (
@@ -25,12 +21,10 @@ export function HomePage() {
       <ExampleFeature />
       {{/if}}
       {{#unless state}}
-      {{#unless fetching}}
       <section style={{ marginTop: "2rem" }}>
         <Button onClick={() => setMsg("Hello!")}>Click me</Button>
         {msg && <p style={{ marginTop: "0.5rem" }}>{msg}</p>}
       </section>
-      {{/unless}}
       {{/unless}}
     </main>
   );
