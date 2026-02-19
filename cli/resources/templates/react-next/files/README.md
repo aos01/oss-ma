@@ -2,7 +2,11 @@
 
 Next.js 15 · App Router · TypeScript
 
-## Getting Started
+## Overview
+
+Modern Next.js application with TypeScript, App Router, and professional tooling.
+
+## Quickstart
 
 ```bash
 npm run dev
@@ -19,7 +23,7 @@ npm run dev
 - `npm run format` — Format code with Prettier
 - `npm run typecheck` — Type check with TypeScript
 
-## Project Structure
+## Architecture
 
 ```
 src/
@@ -29,11 +33,21 @@ src/
 └── lib/           # Library code (providers, etc.)
 ```
 
+See [ADR documentation](docs/adr/) for architectural decisions.
+
 ## Standards
 
 This project follows the [@oss-ma/tpl](https://www.npmjs.com/package/@oss-ma/tpl) standard.
 
 Run `npx @oss-ma/tpl check` to validate compliance.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run `npm run lint && npm test`
+5. Submit a pull request
 
 ## Security
 
